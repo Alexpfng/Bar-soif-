@@ -76,7 +76,7 @@ export function Quiz({ onRetour }: { onRetour: () => void }) {
             const repondu = choix !== null;
             const estBonne = idx === q.bonne;
             const estChoix = idx === choix;
-            let bg = COL.panneau; let bord = COL.bleu1; let fg = COL.creme;
+            let bg: string = COL.panneau; let bord: string = COL.bleu1; const fg: string = COL.creme;
             if (repondu && estBonne) { bg = 'rgba(158,192,107,0.18)'; bord = COL.vert; }
             else if (repondu && estChoix) { bg = 'rgba(225,80,58,0.16)'; bord = COL.rouge; }
             return (
