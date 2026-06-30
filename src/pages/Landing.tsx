@@ -142,7 +142,7 @@ const LANDING_HTML = `
 <header class="site">
   <div class="conteneur nav">
     <a class="marque" href="#haut" aria-label="La Boît'à Soif, accueil">
-      <img src="/brand/logo.png" alt="" width="38" height="38" style="border-radius:8px;display:block" />
+      <img src="${import.meta.env.BASE_URL}brand/logo.png" alt="" width="38" height="38" style="border-radius:8px;display:block" />
       <span class="wordmark">La Boît&rsquo;à <span class="apo">Soif</span></span>
     </a>
     <div class="grandit"></div>

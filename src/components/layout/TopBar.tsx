@@ -46,7 +46,7 @@ export function TopBar({ onOpenPanel }: Props) {
             border: 'none', background: 'transparent', color: COL.bleu9, padding: '4px 2px',
           }}
         >
-          <img src="/brand/logo.png" alt="" width={36} height={36} style={{ borderRadius: 8, display: 'block' }} />
+          <img src={`${import.meta.env.BASE_URL}brand/logo.png`} alt="" width={36} height={36} style={{ borderRadius: 8, display: 'block' }} />
           <Wordmark taille="topbar" />
         </button>
         <div style={{ flex: 1 }} />

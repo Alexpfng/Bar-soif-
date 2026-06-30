@@ -67,7 +67,7 @@ export default function Accueil() {
       <div style={{ position: 'relative', overflow: 'hidden', background: '#14110F', borderBottom: `2px solid ${COL.or}`, padding: '24px 22px 22px' }}>
         <div className="gingham" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, opacity: 0.55 }} aria-hidden="true" />
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <img src="/brand/logo.png" alt="" width={64} height={64} style={{ borderRadius: 14, display: 'block', boxShadow: '0 4px 14px rgba(0,0,0,0.5)' }} />
+          <img src={`${import.meta.env.BASE_URL}brand/logo.png`} alt="" width={64} height={64} style={{ borderRadius: 14, display: 'block', boxShadow: '0 4px 14px rgba(0,0,0,0.5)' }} />
 
           <div>
             <Wordmark taille="hero" color={COL.creme} />

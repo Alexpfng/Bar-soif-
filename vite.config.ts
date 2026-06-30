@@ -2,9 +2,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Vite + PWA : tout est précaché pour un fonctionnement 100 % hors ligne.
-// Le SW n'est enregistré qu'en production publiée (voir src/main.tsx).
-export default defineConfig({
+// Base : '/Bar-soif-/' au build (GitHub Pages = site de projet servi sur un
+// sous-chemin), '/' en dev local. Surchargeable via VITE_BASE pour un autre host
+// (Vercel/Netlify/domaine racine → mettre VITE_BASE=/).
+export default defineConfig(({ command }) => ({
+  base: process.env.VITE_BASE ?? (command === 'build' ? '/Bar-soif-/' : '/'),
   server: { host: '::', port: 8080 },
   plugins: [
     react(),
@@ -15,48 +17,34 @@ export default defineConfig({
       devOptions: { enabled: false },
       includeAssets: ['favicon-*.png', 'apple-touch-icon.png', 'icons/*.png', 'brand/*.png', '.htaccess'],
       manifest: {
-        name: 'Boîte à Soif',
-        short_name: 'Boîte à Soif',
+        name: "La Boît'à Soif",
+        short_name: "Boît'à Soif",
         description:
-          "L'appli qui met l'ambiance au bar : jeux, blagues, chansons à reprendre et toasts pour trinquer. En gros et à voix haute, pour rigoler ensemble à tout âge.",
+          "L'appli des piliers de bar : ton taux d'alcool en direct, le juke-box à conneries, l'ardoise des comptes et le classement des potes.",
         lang: 'fr',
-        start_url: '/',
+        start_url: '.',
+        scope: '.',
         display: 'standalone',
-        background_color: '#F5F0EA',
-        theme_color: '#0F3A4A',
+        background_color: '#1B1917',
+        theme_color: '#1B1917',
         icons: [
-          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-          {
-            src: '/icons/icon-maskable-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
+          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
-        navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/~oauth/],
+        navigateFallback: 'index.html',
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.mode === 'navigate',
             handler: 'NetworkFirst',
             options: { cacheName: 'pages' },
           },
-          {
-            urlPattern: /\/audio\/.*\.mp3$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'audio-cache',
-              rangeRequests: true,
-              expiration: { maxEntries: 5 },
-            },
-          },
         ],
       },
     }),
   ],
   build: { target: 'es2019' },
-});
+}));
