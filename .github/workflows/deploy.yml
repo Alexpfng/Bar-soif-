@@ -29,6 +29,10 @@ jobs:
 
       - name: Build (Vite + PWA)
         run: bun run build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PROJECT_ID: ${{ vars.VITE_SUPABASE_PROJECT_ID }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
 
       - name: Fallback SPA (deep-links / refresh)
         run: cp dist/index.html dist/404.html

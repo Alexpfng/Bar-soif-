@@ -3,7 +3,7 @@ import { AppShell } from '../components/layout/AppShell';
 import { COL, FRAUNCES } from '../ui/theme';
 import { PHRASES, type Phrase } from '../features/jukebox/phrases';
 import { parlerTavernier, tchin, capsule, cacahuete, bip, fanfare } from '../features/audio/sons';
-import { lirePropositions, ajouterProposition, likerProposition, retirerProposition, type Proposition } from '../features/jukebox/propositions';
+import { lirePropositions, ajouterProposition, likerProposition, repliqueDuMois, type Proposition } from '../features/jukebox/propositions';
 
 // Paires {fond, texte} pour garantir le contraste sur fond sombre.
 // On alterne selon l'index : rouge néon, or, ambre, ardoise.
@@ -48,12 +48,15 @@ export default function JukeBox() {
   // Réplique en cours de déclamation (retour visuel).
   const [enCours, setEnCours] = useState<string | null>(null);
   // Répliques proposées par les piliers (boîte à idées locale).
-  const [repliques, setRepliques] = useState<Proposition[]>(() => lirePropositions());
+  const [repliques, setRepliques] = useState<Proposition[]>([]);
   const [nouvelle, setNouvelle] = useState('');
 
   useEffect(() => {
     setTtsDispo(voixDispo());
   }, []);
+
+  const recharger = () => { lirePropositions().then(setRepliques); };
+  useEffect(() => { recharger(); }, []);
 
   // Index global stable pour faire tourner les couleurs des touches.
   let indexGlobal = -1;
@@ -68,9 +71,18 @@ export default function JukeBox() {
   };
   const declamer = (p: Phrase) => declamerTexte(p.texte);
 
-  const ajouterRep = () => { setRepliques(ajouterProposition(nouvelle)); setNouvelle(''); };
-  const likerRep = (id: string) => setRepliques(likerProposition(id));
-  const retirerRep = (id: string) => setRepliques(retirerProposition(id));
+  const ajouterRep = async () => {
+    const t = nouvelle.trim();
+    if (!t) return;
+    setNouvelle('');
+    await ajouterProposition(t);
+    recharger();
+  };
+  const likerRep = async (id: string) => {
+    await likerProposition(id);
+    recharger();
+  };
+  const topMois = repliqueDuMois(repliques);
 
   return (
     <AppShell>
@@ -153,13 +165,23 @@ export default function JukeBox() {
       <section style={{ margin: '30px 16px 0' }}>
         <h2 className="pmu-titre" style={{ fontSize: '1.05rem', margin: '0 0 4px 2px' }}>🎙️ Vos répliques</h2>
         <p style={{ margin: '0 0 12px 2px', fontSize: '0.86rem', color: COL.texte2, lineHeight: 1.45 }}>
-          Proposez vos meilleures vannes et likez celles des potes. <strong style={{ color: COL.or }}>La plus likée du mois</strong> rejoindra le juke-box. <span style={{ opacity: 0.8 }}>(Partage entre tous bientôt — pour l’instant c’est sur cet appareil.)</span>
+          Proposez vos meilleures vannes et likez celles des potes. <strong style={{ color: COL.or }}>La plus likée du mois</strong> trône en haut du juke-box. <span style={{ opacity: 0.8 }}>(Partagé entre tous les piliers 🍻)</span>
         </p>
         <div style={{ display: 'flex', gap: 8 }}>
           <input value={nouvelle} onChange={(e) => setNouvelle(e.target.value)} placeholder="« Patron, remets-nous ça ! »"
             style={{ flex: 1, minHeight: 50, padding: '10px 14px', fontSize: '0.95rem', background: '#14110F', border: `2px solid ${COL.bleu1}`, borderRadius: 12, color: COL.creme }} />
           <button onClick={ajouterRep} className="pmu-arcade" style={{ padding: '0 16px', minHeight: 50 }}>Proposer</button>
         </div>
+        {topMois && (
+          <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 10, background: COL.orangeClair, border: `2px solid ${COL.or}`, borderRadius: 14, padding: '12px 14px' }}>
+            <span style={{ fontSize: '1.5rem' }} aria-hidden="true">👑</span>
+            <span style={{ flex: 1, color: COL.creme, fontWeight: 700, fontSize: '0.92rem', lineHeight: 1.3 }}>
+              <span style={{ display: 'block', fontSize: '0.64rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: COL.or }}>Réplique du mois · {topMois.likes} 👍</span>
+              « {topMois.texte} »
+            </span>
+            <button onClick={() => declamerTexte(topMois.texte)} aria-label="Déclamer la réplique du mois" style={{ width: 40, height: 40, borderRadius: 10, border: 'none', background: COL.or, color: '#2A1F10', fontWeight: 800 }}>🔊</button>
+          </div>
+        )}
         {repliques.length === 0 ? (
           <div style={{ marginTop: 14, background: COL.panneau, border: `2px dashed ${COL.bleu1}`, borderRadius: 14, padding: '18px 16px', textAlign: 'center', color: COL.texte2 }}>
             Aucune réplique proposée. Lance la première légende du comptoir !
@@ -177,7 +199,6 @@ export default function JukeBox() {
                   style={{ display: 'flex', alignItems: 'center', gap: 5, minHeight: 40, padding: '0 12px', borderRadius: 10, border: `2px solid ${p.dejaLike ? COL.or : COL.bleu1}`, background: p.dejaLike ? 'rgba(233,196,106,0.15)' : 'transparent', color: p.dejaLike ? COL.or : COL.texte2, fontWeight: 800 }}>
                   👍 {p.likes}
                 </button>
-                <button onClick={() => retirerRep(p.id)} aria-label="Supprimer" style={{ width: 34, height: 34, borderRadius: 9, border: 'none', background: COL.sable, color: COL.rouge, fontWeight: 700, fontSize: '1.1rem' }}>×</button>
               </li>
             ))}
           </ul>
