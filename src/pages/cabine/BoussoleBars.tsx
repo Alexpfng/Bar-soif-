@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Entete } from './Cadre';
-import { COL, FRAUNCES } from '../../ui/theme';
+import { COL } from '../../ui/theme';
 
 // ── La Boussole à Bars ☀️ ───────────────────────────────────────────────────
 // Géoloc → bars autour (OpenStreetMap / Overpass) + direction (boussole du tél)
