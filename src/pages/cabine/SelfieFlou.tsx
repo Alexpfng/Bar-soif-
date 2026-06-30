@@ -15,6 +15,17 @@ export function SelfieFlou({ onRetour }: { onRetour: () => void }) {
   const flou = Math.min(16, bac * 3.5);
 
   useEffect(() => () => stopper(), []);
+
+  // Attache le flux à la <video> une fois qu'elle est réellement montée
+  // (phase 'active'). Indispensable : sinon la ref est nulle au moment du clic.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (phase === 'active' && v && fluxRef.current) {
+      v.srcObject = fluxRef.current;
+      v.play().catch(() => {});
+    }
+  }, [phase]);
+
   function stopper() {
     fluxRef.current?.getTracks().forEach((t) => t.stop());
     fluxRef.current = null;
@@ -25,13 +36,7 @@ export function SelfieFlou({ onRetour }: { onRetour: () => void }) {
     try {
       const flux = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
       fluxRef.current = flux;
-      setPhase('active');
-      // La balise <video> n'est montée qu'en phase 'active' : on attache le flux
-      // après le passage d'état pour être sûr que la ref existe.
-      requestAnimationFrame(() => {
-        if (videoRef.current) videoRef.current.srcObject = flux;
-        else { flux.getTracks().forEach((t) => t.stop()); fluxRef.current = null; }
-      });
+      setPhase('active'); // l'attache du flux se fait dans l'effet ci-dessus, une fois la <video> montée
     } catch {
       stopper();
       setPhase('refus');
