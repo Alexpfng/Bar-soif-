@@ -55,9 +55,10 @@ export async function retirerAmitie(amitieId: string): Promise<boolean> {
 
 /** Liste mes liens (amis + demandes reçues + envoyées), pseudos résolus. */
 export async function listerAmities(monId: string): Promise<LienAmi[]> {
+  // La RLS ne renvoie déjà que les lignes où je suis demandeur ou destinataire,
+  // donc pas besoin de filtre supplémentaire.
   const { data, error } = await from('amities')
-    .select('id, demandeur, destinataire, statut')
-    .or(`demandeur.eq.${monId},destinataire.eq.${monId}`);
+    .select('id, demandeur, destinataire, statut');
   if (error || !data) return [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
