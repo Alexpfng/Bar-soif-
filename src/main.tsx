@@ -32,17 +32,11 @@ requestAnimationFrame(() => requestAnimationFrame(retirerSplash));
 // Service Worker : enregistré uniquement en production publiée.
 // Désactivé en dev et dans les previews Lovable (sinon caches obsolètes).
 function shouldRegisterSW(): boolean {
-  if (!import.meta.env.PROD) return false;
-  if (typeof window === 'undefined') return false;
-  if (window.top !== window.self) return false; // iframe
-  const url = new URL(window.location.href);
-  if (url.searchParams.get('sw') === 'off') return false;
-  const host = url.hostname;
-  if (host.startsWith('id-preview--') || host.startsWith('preview--')) return false;
-  if (host === 'lovableproject.com' || host.endsWith('.lovableproject.com')) return false;
-  if (host === 'lovableproject-dev.com' || host.endsWith('.lovableproject-dev.com')) return false;
-  if (host === 'beta.lovable.dev' || host.endsWith('.beta.lovable.dev')) return false;
-  return true;
+  // Service worker désactivé pendant le développement : garantit que tout le
+  // monde (surtout mobile) reçoit la dernière version, sans cache obsolète.
+  // L'éventuel SW déjà installé est retiré (voir branche `else` ci-dessous).
+  // À réactiver pour le vrai mode hors-ligne une fois l'app stabilisée.
+  return false;
 }
 
 async function unregisterMatchingSWs(): Promise<void> {

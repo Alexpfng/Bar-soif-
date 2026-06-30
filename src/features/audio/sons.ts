@@ -182,16 +182,42 @@ export function vibrer(pattern: number | number[]): boolean {
   }
 }
 
-// ── Déverrouillage au premier geste (autoplay des navigateurs) ──────────────
-// Crée/relance l'AudioContext et « réveille » la synthèse vocale dès la
-// première interaction, pour que le tout premier appui produise bien du son.
+// iOS 16.4+ : catégorie audio « playback » → le son IGNORE le bouton Silence
+// (sinon, interrupteur silence activé = pas de Web Audio sur iPhone).
+function reglerSessionAudio(): void {
+  try {
+    const ns = navigator as unknown as { audioSession?: { type: string } };
+    if (ns && ns.audioSession) ns.audioSession.type = 'playback';
+  } catch {
+    /* ignore */
+  }
+}
+
+// ── Déverrouillage au premier geste (autoplay + bouton Silence iOS) ──────────
+// Au tout premier toucher : on passe la session audio en « playback », on
+// relance l'AudioContext, on joue un échantillon MUET (déblocage Web Audio iOS)
+// et on réveille la synthèse vocale — pour que le 1er appui produise du son.
 if (typeof document !== 'undefined') {
+  reglerSessionAudio();
   let deverrouille = false;
   const deverrouiller = () => {
     if (deverrouille) return;
     deverrouille = true;
+    reglerSessionAudio();
     const ac = audio();
-    if (ac && ac.state === 'suspended') void ac.resume();
+    if (ac) {
+      if (ac.state === 'suspended') void ac.resume();
+      try {
+        // Échantillon muet joué dans le geste : déblocage Web Audio iOS.
+        const buf = ac.createBuffer(1, 1, 22050);
+        const src = ac.createBufferSource();
+        src.buffer = buf;
+        src.connect(ac.destination);
+        src.start(0);
+      } catch {
+        /* ignore */
+      }
+    }
     if (aTTS) {
       chargerVoix();
       try {
