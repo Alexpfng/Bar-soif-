@@ -14,6 +14,7 @@ import {
   type Profil,
 } from './widmark';
 import { archiverSession } from './historique';
+import { pousserCuite } from './partageCuite';
 
 const CLE_PROFIL = 'pese-alco-profil';
 const CLE_CONSOS = 'pese-alco-consos';
@@ -88,6 +89,7 @@ export function usePeseAlco() {
   const cloturerSession = useCallback(() => {
     setConsos((c) => {
       archiverSession(c, profil);
+      pousserCuite(c, profil).catch(() => { /* hors-ligne : la cuite locale reste dans l'historique */ });
       return persisterConsos([]);
     });
   }, [persisterConsos, profil]);

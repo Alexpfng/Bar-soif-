@@ -53,6 +53,7 @@ export function AccessibilityPanel({ open, onClose }: Props) {
         {/* Mon compte */}
         <h3 style={titreSection}>Mon compte</h3>
         {user ? (
+          <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: COL.panneau, border: `1px solid ${COL.bleu1}`, borderRadius: 14, padding: '12px 14px' }}>
             <span style={{ width: 40, height: 40, borderRadius: '50%', background: COL.or, color: '#2A1F10', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', flexShrink: 0 }} aria-hidden="true">{pseudo.charAt(0).toUpperCase()}</span>
             <span style={{ flex: 1, minWidth: 0 }}>
@@ -61,6 +62,8 @@ export function AccessibilityPanel({ open, onClose }: Props) {
             </span>
             <button onClick={deco} style={{ flexShrink: 0, minHeight: 40, padding: '0 14px', borderRadius: 10, border: `2px solid ${COL.bleu1}`, background: 'transparent', color: COL.texte2, fontWeight: 700, fontSize: '0.82rem' }}>Déconnexion</button>
           </div>
+          <button onClick={() => { onClose(); navigate(`/profil/${user.id}`); }} className="pmu-arcade pmu-arcade--ardoise" style={{ width: '100%', marginTop: 10, minHeight: 46 }}>🎖️ Mon profil de pilier</button>
+          </>
         ) : (
           <button onClick={() => { onClose(); navigate('/connexion'); }} className="pmu-arcade" style={{ width: '100%', minHeight: 52 }}>Se connecter</button>
         )}

@@ -141,8 +141,10 @@ export default function Amis() {
           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
             {amis.map((l) => (
               <li key={l.amitieId} style={{ display: 'flex', alignItems: 'center', gap: 10, background: COL.panneau, border: `1px solid ${COL.bleu1}`, borderRadius: 14, padding: '10px 12px' }}>
-                <Pastille>{l.pseudo.charAt(0).toUpperCase()}</Pastille>
-                <span style={{ flex: 1, fontWeight: 800, color: COL.creme, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.pseudo}</span>
+                <button onClick={() => navigate(`/profil/${l.autreId}`)} style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0, background: 'transparent', border: 'none', textAlign: 'left', padding: 0 }}>
+                  <Pastille>{l.pseudo.charAt(0).toUpperCase()}</Pastille>
+                  <span style={{ flex: 1, minWidth: 0, fontWeight: 800, color: COL.creme, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.pseudo} ›</span>
+                </button>
                 <button onClick={() => retirer(l)} style={{ ...btn, background: 'transparent', color: COL.texte2, border: `2px solid ${COL.bleu1}` }}>Retirer</button>
               </li>
             ))}

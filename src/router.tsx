@@ -14,6 +14,7 @@ const Amis             = lazy(() => import('./pages/Amis'));
 const Concours         = lazy(() => import('./pages/Concours'));
 const ConcoursSalle    = lazy(() => import('./pages/ConcoursSalle'));
 const CartePiliers     = lazy(() => import('./pages/CartePiliers'));
+const Profil           = lazy(() => import('./pages/Profil'));
 const Analyse          = lazy(() => import('./pages/Analyse'));
 const Cabine           = lazy(() => import('./pages/Cabine'));
 const Bientot          = lazy(() => import('./pages/Bientot'));
@@ -52,6 +53,7 @@ const routes: RouteObject[] = [
   { path: '/concours',              element: <P><Concours /></P> },
   { path: '/concours/:code',        element: <P><ConcoursSalle /></P> },
   { path: '/carte',                 element: <P><CartePiliers /></P> },
+  { path: '/profil/:id',            element: <P><Profil /></P> },
   { path: '/analyse',               element: <P><Analyse /></P> },
   { path: '/cabine',                element: <P><Cabine /></P> },
   { path: '/bientot',               element: <P><Bientot /></P> },
