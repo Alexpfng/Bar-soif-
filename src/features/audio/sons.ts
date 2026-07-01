@@ -18,7 +18,12 @@ function audio(): AudioContext | null {
     const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!AC) return null;
     if (!ctx) ctx = new AC();
-    if (ctx.state === 'suspended') void ctx.resume();
+    // iOS laisse le contexte « suspended » (autoplay) OU « interrupted » (après un
+    // appel / une interruption système) : dans les deux cas il faut le relancer,
+    // sinon le son reste muet (« je n'ai plus de son » alors que ça marchait).
+    if ((ctx.state as string) !== 'running' && (ctx.state as string) !== 'closed') {
+      void ctx.resume();
+    }
     return ctx;
   } catch {
     return null;
@@ -206,14 +211,16 @@ function reglerSessionAudio(): void {
 // et on réveille la synthèse vocale — pour que le 1er appui produise du son.
 if (typeof document !== 'undefined') {
   reglerSessionAudio();
-  let deverrouille = false;
-  const deverrouiller = () => {
-    if (deverrouille) return;
-    deverrouille = true;
+  // Le tout premier déblocage Web Audio (échantillon muet) n'a lieu qu'une fois,
+  // mais on RÉVEILLE le contexte à chaque geste ET à chaque retour au premier
+  // plan : sur iOS, quitter la PWA (appel, écran verrouillé, changement d'appli)
+  // suspend/interrompt l'AudioContext ; sans relance, le son reste muet au retour.
+  let webAudioDebloque = false;
+  const reveiller = () => {
     reglerSessionAudio();
-    const ac = audio();
-    if (ac) {
-      if (ac.state === 'suspended') void ac.resume();
+    const ac = audio(); // audio() relance déjà un contexte suspendu/interrompu
+    if (ac && !webAudioDebloque) {
+      webAudioDebloque = true;
       try {
         // Échantillon muet joué dans le geste : déblocage Web Audio iOS.
         const buf = ac.createBuffer(1, 1, 22050);
@@ -222,14 +229,20 @@ if (typeof document !== 'undefined') {
         src.connect(ac.destination);
         src.start(0);
       } catch {
-        /* ignore */
+        webAudioDebloque = false;
       }
     }
     // On précharge seulement les voix (sans parler) : sur iOS, la vraie parole
     // est déclenchée par le tap sur un bouton, directement dans son geste.
     if (aTTS) chargerVoix();
   };
+  // Volontairement PAS « once » : chaque geste retente la relance tant que le
+  // contexte n'est pas réellement « running ».
   ['pointerdown', 'touchstart', 'keydown'].forEach((ev) =>
-    document.addEventListener(ev, deverrouiller, { once: true, passive: true })
+    document.addEventListener(ev, reveiller, { passive: true }),
   );
+  // Retour au premier plan : relance le contexte suspendu par l'arrière-plan.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') reveiller();
+  });
 }
