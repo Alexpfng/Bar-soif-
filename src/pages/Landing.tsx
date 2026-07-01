@@ -160,9 +160,9 @@ const LANDING_HTML = `
       <span class="pastille">100 % gratuit · À consommer avec modération</span>
       <h1>Suis la tournée.<br />Garde le <span class="accent">contrôle</span>.</h1>
       <p class="sous">
-        La Boît&rsquo;à Soif, c&rsquo;est le copilote de tes soirées : ton taux d&rsquo;alcool estimé
-        <strong>en direct</strong>, les répliques du tavernier, l&rsquo;ardoise de tes consos
-        et le classement des potes. Le tout en gros — et avec le sourire.
+        La Boît&rsquo;à Soif, c&rsquo;est le copilote de tes soirées : ton taux d&rsquo;alcool
+        <strong>en direct</strong>, le juke-box de répliques, <strong>plus de 20 mini-jeux</strong>,
+        la carte de tes potes et des <strong>tournois</strong> pour chambrer la bande. Le tout en gros — et avec le sourire.
       </p>
       <div class="actions">
         <a class="btn btn-primaire" href="${import.meta.env.BASE_URL}app">Ouvrir la boîte</a>
@@ -237,8 +237,8 @@ const LANDING_HTML = `
   <div class="conteneur">
     <div class="titre-bloc">
       <span class="kicker">Ce qu&rsquo;il y a dans la boîte</span>
-      <h2>Quatre comptoirs, zéro prise de tête</h2>
-      <p>Pas de menus à rallonge : quatre grandes portes d&rsquo;entrée, pensées pour aller vite, le verre à la main.</p>
+      <h2>Tout ce qu&rsquo;il faut pour la soirée</h2>
+      <p>Pas de menus à rallonge : de grandes portes d&rsquo;entrée, pensées pour aller vite, le verre à la main.</p>
     </div>
     <div class="sections-grille">
       <div class="carte-section" style="background:#e14b3a; color:#fff;">
@@ -260,6 +260,21 @@ const LANDING_HTML = `
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#2a1f10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21 H16"/><path d="M12 17 V21"/><path d="M6 4 H18 V8 C18 11.3 15.3 13.5 12 13.5 C8.7 13.5 6 11.3 6 8 Z"/><path d="M18 5 H21 V7.5 C21 9 20 10 18.5 10"/><path d="M6 5 H3 V7.5 C3 9 4 10 5.5 10"/></svg>
         <h3>Le Tableau des Champions</h3>
         <p>Le classement des potes en direct, façon borne d&rsquo;arcade. Trinque à distance et dégaine le verre d&rsquo;eau d&rsquo;urgence.</p>
+      </div>
+      <div class="carte-section" style="background:#14110f; color:#f3e8cf; border:1px solid #e9c46a;">
+        <div class="ico" style="font-size:2rem; line-height:1;" aria-hidden="true">🎪</div>
+        <h3>La Cabine</h3>
+        <p>Plus de 20 mini-jeux de comptoir : éthylotest, horoscope du pilier, traducteur régional (8 accents), quiz, La Rivière… et le Niveau de Pilier à faire grimper.</p>
+      </div>
+      <div class="carte-section" style="background:#e14b3a; color:#fff;">
+        <div class="ico" style="font-size:2rem; line-height:1;" aria-hidden="true">🗺️</div>
+        <h3>La Carte des piliers</h3>
+        <p>Tes potes sur la carte façon Snap (avec mode fantôme), les coins qui bougent — « The Place to Bar » — et la moyenne de consos du groupe.</p>
+      </div>
+      <div class="carte-section" style="background:#e9c46a; color:#2a1f10;">
+        <div class="ico" style="font-size:2rem; line-height:1;" aria-hidden="true">🏆</div>
+        <h3>Les Concours</h3>
+        <p>Défie tes potes en tournoi : plusieurs mini-jeux barrés qui s&rsquo;enchaînent (cri de guerre, shaker, réflexes…), classement final aux points.</p>
       </div>
     </div>
   </div>
