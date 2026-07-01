@@ -81,6 +81,28 @@ export async function lirePublicsProches(lat: number, lon: number): Promise<Publ
     .slice(0, 20);
 }
 
+export interface Zone { lat: number; lon: number; nb: number; dist: number; cap: number }
+
+/** « Les coins qui bougent » : agrège la présence publique par cellule (~500 m).
+ *  Ne montre une zone qu'à partir de `seuil` piliers (anonyme, jamais un individu). */
+export async function lireZonesChaudes(lat: number, lon: number, seuil = 2): Promise<Zone[]> {
+  const { data, error } = await f('presence_publique').select('lat_floue, lon_floue').limit(1000);
+  if (error || !data) return [];
+  const cells = new Map<string, { lat: number; lon: number; nb: number }>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (data as any[]).forEach((p) => {
+    const k = `${p.lat_floue.toFixed(3)},${p.lon_floue.toFixed(3)}`;
+    const e = cells.get(k) || { lat: p.lat_floue, lon: p.lon_floue, nb: 0 };
+    e.nb++;
+    cells.set(k, e);
+  });
+  return [...cells.values()]
+    .filter((z) => z.nb >= seuil)
+    .map((z) => ({ ...z, dist: distance(lat, lon, z.lat, z.lon), cap: cap(lat, lon, z.lat, z.lon) }))
+    .sort((a, b) => b.nb - a.nb)
+    .slice(0, 15);
+}
+
 export function abonnerPresence(onChange: () => void): () => void {
   const ch = supabase.channel('presence-geo').on('postgres_changes', { event: '*', schema: 'public', table: 'presence_geo' }, onChange).subscribe();
   return () => { supabase.removeChannel(ch); };

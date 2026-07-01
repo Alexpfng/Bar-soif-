@@ -5,8 +5,8 @@ import { usePeseAlco } from '../features/pesealco/usePeseAlco';
 import { ecrireStockage } from '../lib/storage';
 import { envoyerDemande } from '../features/champions/amis';
 import {
-  publierPresence, lireAmisPresents, lirePublicsProches, abonnerPresence, lireReglages, cardinal,
-  type AmiPresent, type PublicProche, type Reglages, type Visibilite,
+  publierPresence, lireAmisPresents, lirePublicsProches, lireZonesChaudes, abonnerPresence, lireReglages, cardinal,
+  type AmiPresent, type PublicProche, type Zone, type Reglages, type Visibilite,
 } from '../features/proximite/api';
 
 const fmtBac = (g: number) => g.toFixed(2).replace('.', ',');
@@ -20,6 +20,7 @@ export default function CartePiliers() {
   const [pos, setPos] = useState<{ lat: number; lon: number } | null>(null);
   const [amis, setAmis] = useState<AmiPresent[]>([]);
   const [publics, setPublics] = useState<PublicProche[]>([]);
+  const [zones, setZones] = useState<Zone[]>([]);
   const [reglages, setReglages] = useState<Reglages>(() => lireReglages());
   const [flash, setFlash] = useState<string | null>(null);
 
@@ -31,10 +32,11 @@ export default function CartePiliers() {
 
   const rafraichir = useCallback(async (lat: number, lon: number) => {
     await publierPresence(lat, lon, bac, nbConsos);
-    const [a, p] = await Promise.all([lireAmisPresents(), lirePublicsProches(lat, lon)]);
+    const [a, p, z] = await Promise.all([lireAmisPresents(), lirePublicsProches(lat, lon), lireZonesChaudes(lat, lon)]);
     setAmis(a);
     const idsAmis = new Set(a.map((x) => x.user_id));
     setPublics(p.filter((x) => !idsAmis.has(x.user_id)));
+    setZones(z);
   }, [bac, nbConsos]);
 
   function activer() {
@@ -62,6 +64,9 @@ export default function CartePiliers() {
     }
     const Lg = layerRef.current;
     Lg.clearLayers();
+    zones.forEach((z) => {
+      L.circleMarker([z.lat, z.lon], { radius: 14 + Math.min(24, z.nb * 3), color: '#EC9A4B', weight: 1, fillColor: '#E14B3A', fillOpacity: 0.28 }).addTo(Lg).bindPopup(`🔥 Ça bouge : ${z.nb} piliers`);
+    });
     if (reglages.visibilite !== 'fantome') {
       L.circleMarker([pos.lat, pos.lon], { radius: 9, color: '#E9C46A', weight: 2, fillColor: '#E9C46A', fillOpacity: 1 }).addTo(Lg).bindPopup('Toi ⭐');
     }
@@ -69,7 +74,7 @@ export default function CartePiliers() {
       L.circleMarker([a.lat, a.lon], { radius: 8, color: '#E14B3A', weight: 2, fillColor: '#E14B3A', fillOpacity: 0.9 })
         .addTo(Lg).bindPopup(`${a.pseudo} — ${a.consos} conso${a.consos > 1 ? 's' : ''}, ${fmtBac(a.bac)} g/L`);
     });
-  }, [phase, pos, amis, reglages.visibilite]);
+  }, [phase, pos, amis, zones, reglages.visibilite]);
 
   useEffect(() => () => { if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; } }, []);
 
@@ -156,6 +161,27 @@ export default function CartePiliers() {
             <div ref={divRef} style={{ width: '100%', height: 300, borderRadius: 16, overflow: 'hidden', border: `2px solid ${COL.bleu1}`, background: COL.panneau }} />
             {typeof (window as unknown as { L?: unknown }).L === 'undefined' && (
               <p style={{ color: COL.texte2, fontSize: '0.82rem', marginTop: 8 }}>Carte indisponible (hors ligne). Réessaie avec du réseau.</p>
+            )}
+          </section>
+
+          {/* The Place to Bar : les coins qui bougent */}
+          <section style={{ margin: '18px 16px 0' }}>
+            <h2 style={{ fontFamily: FRAUNCES, fontWeight: 700, fontSize: '1.1rem', color: COL.or, margin: '0 2px 2px' }}>🔥 The Place to Bar</h2>
+            <p style={{ margin: '0 2px 10px', fontSize: '0.8rem', color: COL.texte2 }}>Les coins qui bougent : là où les piliers publics se regroupent.</p>
+            {zones.length === 0 ? (
+              <div style={{ background: COL.panneau, border: `2px dashed ${COL.bleu1}`, borderRadius: 14, padding: '14px', textAlign: 'center', color: COL.texte2 }}>
+                Rien qui frétille pour l’instant. Ça s’allumera quand plusieurs piliers publics se retrouveront au même endroit. 🍺
+              </div>
+            ) : (
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {zones.map((z, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, background: COL.panneau, border: `1px solid ${i === 0 ? COL.or : COL.bleu1}`, borderRadius: 12, padding: '10px 12px' }}>
+                    <span style={{ fontSize: '1.3rem' }} aria-hidden="true">🔥</span>
+                    <span style={{ flex: 1, fontWeight: 700, color: COL.creme }}>{z.nb} piliers <span style={{ fontSize: '0.75rem', color: COL.texte2, fontWeight: 600 }}>· ~{fmtDist(z.dist)} · {cardinal(z.cap)}</span></span>
+                    {i === 0 && <span style={{ fontSize: '0.7rem', fontWeight: 800, color: COL.or, textTransform: 'uppercase' }}>Le spot 🍻</span>}
+                  </li>
+                ))}
+              </ul>
             )}
           </section>
 
