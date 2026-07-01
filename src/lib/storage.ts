@@ -22,6 +22,7 @@ const CLES_GLOBALES = new Set(['a11y', 'install-fermee']);
 export const CLES_PERSONNELLES = [
   'pese-alco-profil', 'pese-alco-consos', 'pese-alco-historique',
   'cabine-derniere', 'cabine-pisse', 'cabine-legendes', 'cabine-xp',
+  'geo-visibilite', 'geo-public',
 ];
 
 let utilisateurCourant: string | null = null;

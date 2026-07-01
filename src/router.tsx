@@ -13,6 +13,7 @@ const Champions        = lazy(() => import('./pages/Champions'));
 const Amis             = lazy(() => import('./pages/Amis'));
 const Concours         = lazy(() => import('./pages/Concours'));
 const ConcoursSalle    = lazy(() => import('./pages/ConcoursSalle'));
+const CartePiliers     = lazy(() => import('./pages/CartePiliers'));
 const Analyse          = lazy(() => import('./pages/Analyse'));
 const Cabine           = lazy(() => import('./pages/Cabine'));
 const Bientot          = lazy(() => import('./pages/Bientot'));
@@ -50,6 +51,7 @@ const routes: RouteObject[] = [
   { path: '/amis',                  element: <P><Amis /></P> },
   { path: '/concours',              element: <P><Concours /></P> },
   { path: '/concours/:code',        element: <P><ConcoursSalle /></P> },
+  { path: '/carte',                 element: <P><CartePiliers /></P> },
   { path: '/analyse',               element: <P><Analyse /></P> },
   { path: '/cabine',                element: <P><Cabine /></P> },
   { path: '/bientot',               element: <P><Bientot /></P> },
